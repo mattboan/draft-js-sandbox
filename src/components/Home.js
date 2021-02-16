@@ -1,9 +1,18 @@
 import React from "react";
-import { EditorState } from 'draft-js';
-import Editor from 'draft-js-plugins-editor';
-import createMarkdownPlugin from 'draft-js-markdown-plugin';
+import { Editor, EditorState, RichUtils } from 'draft-js';
+import PrismDecorator from 'draft-js-prism';
+import Prism from 'prismjs';
+
+import Toolbar from "./editor-toolbar/toolbar";
 
 import "./styles/Home.css";
+import "../prism-themes/prism.css";
+
+var decorator = new PrismDecorator({
+    // Provide your own instance of PrismJS
+    prism: Prism,
+    defaultSyntax: "javascript"
+  });
 
 class Home extends React.Component {
 
@@ -11,8 +20,7 @@ class Home extends React.Component {
         super(props);
 
         this.state = {
-            editorState: EditorState.createEmpty(),
-            plugins: [createMarkdownPlugin()]
+            editorState: EditorState.createEmpty(decorator),
         };
     }
 
@@ -22,17 +30,25 @@ class Home extends React.Component {
         });
       };
 
-    render() {
-        return(<div className="Home">
-            <h3>Draft JS Sandbox</h3>
+      toggleBlockType = blockType => {
+        this.onChange(RichUtils.toggleBlockType(this.state.editorState, blockType));
+      };
+    
 
+    render() {
+        return(
+        <div className="Home">
+            <h3>Draft JS Sandbox</h3>
+            <Toolbar
+            editorState={this.state.editorState}
+            onToggle={this.toggleBlockType}
+          />
             <div className="editorCon">
-            <Editor
-            className="editor"
-        editorState={this.state.editorState}
-        onChange={this.onChange}
-        plugins={this.state.plugins}
-      />
+            
+                <Editor
+                    editorState={this.state.editorState}
+                    onChange={this.onChange}
+                />
             </div>
         </div>);
     }
